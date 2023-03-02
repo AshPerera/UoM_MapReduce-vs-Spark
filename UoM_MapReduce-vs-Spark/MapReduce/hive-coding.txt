@@ -1,0 +1,56 @@
+To load the DelayedFlights-updated.csv file into Hive, we can follow these steps:
+
+Upload the file to HDFS using the hdfs dfs -put command.
+
+hdfs dfs -put DelayedFlights-updated.csv /path/to/csv/file/in/hdfs
+
+Create an external table in Hive that points to the location of the CSV file.
+
+CREATE EXTERNAL TABLE delay_flights (
+  Year int,
+  Month int,
+  DayofMonth int,
+  DayOfWeek int,
+  DepTime int,
+  CRSDepTime int,
+  ArrTime int,
+  CRSArrTime int,
+  UniqueCarrier string,
+  FlightNum int,
+  TailNum string,
+  ActualElapsedTime int,
+  CRSElapsedTime int,
+  AirTime int,
+  ArrDelay int,
+  DepDelay int,
+  Origin string,
+  Dest string,
+  Distance int,
+  TaxiIn int,
+  TaxiOut int,
+  Cancelled int,
+  CancellationCode string,
+  Diverted int,
+  CarrierDelay int,
+  WeatherDelay int,
+  NASDelay int,
+  SecurityDelay int,
+  LateAircraftDelay int
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION '/path/to/csv/file/in/hdfs';
+
+In the above code snippet, we are creating an external table named delay_flights with columns that match the columns in the CSV file. The ROW FORMAT DELIMITED clause specifies that the fields in the CSV file are separated by a delimiter. Here, we are using , as the delimiter. The STORED AS TEXTFILE clause specifies that the data is stored in text format. Finally, we specify the location of the CSV file in HDFS using the LOCATION clause.
+
+Once the table is created, we can run the following query to get the year-wise carrier delay:
+
+SELECT Year, AVG(CarrierDelay) AS avg_carrier_delay
+FROM delay_flights
+WHERE Year BETWEEN 2003 AND 2010
+GROUP BY Year;
+
+In this query, we are selecting the Year column and the average of the CarrierDelay column for each year between 2003 and 2010. We group the results by Year to get the year-wise summary.
+
+We can run similar queries to get the year-wise NAS delay, weather delay, late aircraft delay, and security delay by replacing CarrierDelay with the appropriate column name in the query.

@@ -1,0 +1,26 @@
+val spark = SparkSession.builder().appName("CarrierDelayByYear").master("local[*]").getOrCreate()
+
+// Read the flights CSV file into a DataFrame
+val df = spark.read.format("csv").option("header", "true").load("s3://delayedflights/DelayedFlights-updated.csv")
+
+val df = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("s3://delayedflights/DelayedFlights-updated.csv")
+
+ // Create a temporary view for the DataFrame
+ df.createOrReplaceTempView("flights")
+    
+spark.conf.set("spark.sql.debug.maxToStringFields", 1000)
+
+ // Run the SQL query
+val result = spark.sql("SELECT Year, avg((CarrierDelay /ArrDelay)*100) from flights GROUP BY Year")
+val result = spark.sql("SELECT Year, avg((NASDelay /ArrDelay)*100) from flights GROUP BY Year")
+val result = spark.sql("SELECT Year, avg((WeatherDelay /ArrDelay)*100) from flights GROUP BY Year")
+val result = spark.sql("SELECT Year, avg((LateAircraftDelay /ArrDelay)*100) from flights GROUP BY Year")
+val result = spark.sql("SELECT Year, avg((SecurityDelay /ArrDelay)*100) from flights GROUP BY Year")
+
+ // Print the result
+result.show()
+    
+ // Stop the SparkSession
+spark.stop()
+
+
